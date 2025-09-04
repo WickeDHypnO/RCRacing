@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 
-public class HoverCarControl : MonoBehaviour
+public class HoverCarControl : NetworkBehaviour
 {
     Rigidbody body;
     float deadZone = 0.1f;
@@ -96,7 +97,7 @@ public class HoverCarControl : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    public void FixedUpdate()
     {
         //  Do hover/bounce force
         RaycastHit hit;
@@ -110,7 +111,12 @@ public class HoverCarControl : MonoBehaviour
             var hoverPoint = hoverPoints[i];
             if (Physics.Raycast(hoverPoint.transform.position, -Vector3.up, out hit, hoverHeight, layerMask))
             {
-                body.AddForceAtPosition(Vector3.up * hoverForce * (1.0f - (hit.distance / hoverHeight)), hoverPoint.transform.position);
+                if (HasStateAuthority)
+                {
+                    body.AddForceAtPosition(Vector3.up * (hoverForce * (1.0f - (hit.distance / hoverHeight))),
+                        hoverPoint.transform.position);
+                }
+
                 distances[i] = hit.distance;
                 grounded = true;
                 groundedWheels[i] = true;
@@ -120,6 +126,9 @@ public class HoverCarControl : MonoBehaviour
                 distances[i] = hoverHeight;
             }
         }
+
+        if (!HasStateAuthority) return;
+        
         for (int i = 0; i < hoverPoints.Length; i++)
         {
             var hoverPoint = hoverPoints[i];
@@ -130,12 +139,12 @@ public class HoverCarControl : MonoBehaviour
                     // Self levelling - returns the vehicle to horizontal when not grounded and simulates gravity
                     if (transform.position.y > hoverPoint.transform.position.y)
                     {
-                        body.AddForceAtPosition(hoverPoint.transform.up * gravityForce * selfLevelingStrength, hoverPoint.transform.position);
+                        body.AddForceAtPosition(hoverPoint.transform.up * (gravityForce * selfLevelingStrength), hoverPoint.transform.position);
                         body.AddForceAtPosition(Vector3.up * -gravityForce, hoverPoint.transform.position);
                     }
                     else
                     {
-                        body.AddForceAtPosition(hoverPoint.transform.up * -gravityForce * selfLevelingStrength, hoverPoint.transform.position);
+                        body.AddForceAtPosition(hoverPoint.transform.up * (-gravityForce * selfLevelingStrength), hoverPoint.transform.position);
                         body.AddForceAtPosition(Vector3.up * -gravityForce, hoverPoint.transform.position);
                     }
                 }
@@ -159,32 +168,32 @@ public class HoverCarControl : MonoBehaviour
             turnValue /= 100f;
         }
         DebugVelocity = body.linearVelocity.magnitude;
+
         if (Mathf.Abs(thrust) > 0 && grounded)
         {
-
-            body.AddForce(transform.forward * thrust * accelerationCurve.Evaluate(body.linearVelocity.sqrMagnitude / (body.linearVelocity.normalized * maxVelocity).sqrMagnitude));
+            body.AddForce(transform.forward * (thrust * accelerationCurve.Evaluate(body.linearVelocity.sqrMagnitude / (body.linearVelocity.normalized * maxVelocity).sqrMagnitude)));
         }
-
+        
         if (turnValue > 0)
         {
             if (thrust > 0)
             {
-                body.AddRelativeTorque(Vector3.up * turnValue * turnStrength);
+                body.AddRelativeTorque(Vector3.up * (turnValue * turnStrength));
             }
             else if (thrust < 0)
             {
-                body.AddRelativeTorque(Vector3.up * -turnValue * turnStrength);
+                body.AddRelativeTorque(Vector3.up * (-turnValue * turnStrength));
             }
         }
         else if (turnValue < 0)
         {
             if (thrust > 0)
             {
-                body.AddRelativeTorque(Vector3.up * turnValue * turnStrength);
+                body.AddRelativeTorque(Vector3.up * (turnValue * turnStrength));
             }
             else if (thrust < 0)
             {
-                body.AddRelativeTorque(Vector3.up * -turnValue * turnStrength);
+                body.AddRelativeTorque(Vector3.up * (-turnValue * turnStrength));
             }
         }
 
