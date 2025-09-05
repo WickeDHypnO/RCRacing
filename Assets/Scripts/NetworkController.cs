@@ -19,7 +19,7 @@ public class NetworkController : SimulationBehaviour, IPlayerJoined, ISceneLoadD
 
     public void PlayerJoined(PlayerRef player)
     {
-        if (Runner.ActivePlayers.Count() == 1)
+        if (Runner.ActivePlayers.Count() == 2)
         {
             Runner.LoadScene("Demo");
         }
