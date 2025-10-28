@@ -3,14 +3,16 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | {{{ PRODUCT_NAME }}}</title>
+    <title>{{{ PRODUCT_NAME }}}</title>
 #if SHOW_DIAGNOSTICS
     <link rel="stylesheet" href="<<<TemplateData/diagnostics.css>>>">
     <script src="<<<TemplateData/diagnostics.js>>>"></script>
 #endif
   </head>
   <body style="text-align: center; padding: 0; border: 0; margin: 0;">
-    <canvas id="unity-canvas" tabindex="-1" style="width: 100%; height: 100%; background: {{{ BACKGROUND_FILENAME ? 'url(\'Build/' + BACKGROUND_FILENAME.replace(/'/g, '%27') + '\') center / cover' : BACKGROUND_COLOR }}}"></canvas>
+    <canvas id="unity-canvas" tabindex="-1" style=
+      "width: 100%; height: 100%; background: {{{ BACKGROUND_FILENAME ? 'url(\'Build/' + BACKGROUND_FILENAME.replace(/'/g, '%27') + '\') center / cover' : BACKGROUND_COLOR }}}; background: black; cursor: default; filter: blur(8px); -webkit-filter: blur(8px);">
+    </canvas>
 #if SHOW_DIAGNOSTICS
     <div id="unity-footer">
         <img id="diagnostics-icon" src="TemplateData/webmemd-icon.png">
